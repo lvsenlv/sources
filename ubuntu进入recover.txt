@@ -1,0 +1,4 @@
+开机时一直按住shift键，找到recovery mode（在advanced options中）
+选择root用户进入
+若要获取编辑权限，执行以下代码
+mount -o remount,rw /

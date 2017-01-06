@@ -1,0 +1,155 @@
+| 管道 (pipeline) 
+pipeline 是 UNIX 系统，基础且重要的观念。连结上个指令的标准输出，做为下个指令的标准输入。
+
+
+
+xargs是一条Unix和类Unix操作系统的常用命令。它的作用是将参数列表转换成小块分段传递给其他命令，
+以避免参数列表过长的问题
+
+空格是默认的分隔符
+
+-n表示每行显示的参数个数
+
+-d表示使用的分隔符
+
+例如
+$ echo "splitXhiXamosliXsplit" | xargs -d "X" -n 1
+split
+hi
+amosli
+split
+将显示的字符串，以X为分隔符，每行显示一个参数
+
+
+
+find查找命令
+find pathname -options [-print -exec -ok ...]
+
+pathname: find命令所查找的目录路径。例如用.来表示当前目录，用/来表示系统根目录。 
+-print： find命令将匹配的文件输出到标准输出。 
+
+-type  查找某一类型的文件，诸如：
+b - 块设备文件
+d - 目录
+c - 字符设备文件
+p - 管道文件
+l - 符号链接文件
+f - 普通文件
+
+
+例
+find /path -type f -print0 | xargs -0 rm
+
+本例中xargs将find产生的长串文件列表拆散成多个子串，然后对每个子串调用rm。
+-print0表示输出以null分隔（-print使用换行）；
+-0表示输入以null分隔。这样要比如下使用find命令效率高的多
+
+
+
+md5sum是用来计算和校验文件报文摘要的工具程序
+
+md5sum [OPTION] [FILE]
+
+md5sum test     生成test文件的md5值          
+
+选项：
+-b 以二进制模式读入文件内容
+-t 以文本模式读入文件内容
+-c 根据已生成的md5值，对现存文件进行校验
+--status 校验完成后，不生成错误或正确的提示信息，可以通过命令的返回值来判断。
+
+
+
+grep命令
+grep（全局正则表达式版本）允许对文本文件进行模式查找。
+如果找到匹配模式，grep打印包含模式的所有行。
+grep支持基本正则表达式，也支持其扩展集。
+在grep命令中输入字符串参数时，最好将其用双引号括起来
+
+-c          只输出匹配行的计数。
+-i          不区分大小写（只适用于单字符）。
+-h          查询多文件时不显示文件名。
+-l          查询多文件时只输出包含匹配字符的文件名。
+-n          显示匹配行及行号。
+-s          不显示不存在或无匹配文本的错误信息。
+-v          显示不包含匹配文本的所有行
+
+例
+$ grep "sort" *.doc       在所有.doc文件中查找sort单词
+
+
+
+
+tee以标准输入作为输入，标准输出和文件作为输出
+tee file       //输出到file，若存在则覆盖
+tee -a file    //追加到file末尾
+
+
+
+综合实例：
+
+find -type -f -print0 | xargs -0 md5sum | grep -v isolinux/boot.cat | tee md5sum.txt
+
+解释：
+(1)find -type -f -print0
+在当前目录下查找普通类型的文件，并以null分隔符输出
+
+(2)| xargs -0 md5sum
+将以null为分隔符的输入参数拆分为小分段，并作为输入，执行md5sum命令，生成所有小分段参数的md5值
+
+(3)| grep -v isolinux/boot.cat
+将所有md5值作为输入，在isolinux/boot.cat文件中查找，输出所有不匹配的行内容
+
+(4)| tee md5sum.txt
+将所有不匹配的行内容，作为标准输入，并输出到md5sum.txt文件中
+
+
+
+
+mkisofs命令用来将指定的目录与文件做成ISO 9660格式的映像文件，以供刻录光盘。
+
+mkisofs(选项)(参数)
+
+-a或--all：mkisofs通常不处理备份文件。使用此参数可以把备份文件加到映像文件中； 
+-A<应用程序id>或-appid<应用程序ID>：指定光盘的应用程序ID； 
+-abstract<摘要文件>：指定摘要文件的文件名； 
+-b<开机映像文件>或-eltorito-boot<开机映像文件>：指定在制作可开机光盘时所需的开机映像文件； 
+-biblio：指定ISBN文件的文件名，ISBN文件位于光盘根目录下，记录光盘的ISBN； 
+-c<开机文件名称>：制作可开机光盘时，mkisofs会将开机映像文件中的全-eltorito-catalog<开机文件名称>全部内容作成一个文件； 
+-C<盘区编号，盘区编号>：将许多节区合成一个映像文件时，必须使用此参数； 
+-copyright<版权信息文件>：指定版权信息文件的文件名； 
+-d或-omit-period：省略文件后的句号； 
+-D或-disable-deep-relocation：ISO 9660最多只能处理8层的目录，超过8层的部分，RRIP会自动将它们设置成ISO 9660兼容的格式。使用-D参数可关闭此功能； 
+-f或-follow-links：忽略符号连接； 
+-h：显示帮助； 
+-hide<目录或文件名>：使指定的目录或文件在ISO 9660或Rock RidgeExtensions的系统中隐藏； 
+-hide-joliet<目录或文件名>：使指定的目录或文件在Joliet系统中隐藏； 
+-J或-joliet：使用Joliet格式的目录与文件名称； 
+-l或-full-iso9660-filenames：使用ISO 9660 32字符长度的文件名； 
+-L或-allow-leading-dots：允许文件名的第一个字符为句号； 
+-log-file<记录文件>：在执行过程中若有错误信息，预设会显示在屏幕上； 
+-m<目录或文件名>或-exclude<目录或文件名>：指定的目录或文件名将不会房入映像文件中； 
+-M<映像文件>或-prev-session<映像文件>：与指定的映像文件合并； 
+-N或-omit-version-number：省略ISO 9660文件中的版本信息； 
+-o<映像文件>或-output<映像文件>：指定映像文件的名称； 
+-p<数据处理人>或-preparer<数据处理人>：记录光盘的数据处理人； 
+-print-size：显示预估的文件系统大小； 
+-quiet：执行时不显示任何信息； 
+-r或-rational-rock：使用Rock Ridge Extensions，并开放全部文件的读取权限； 
+-R或-rock：使用Rock Ridge Extensions； 
+-sysid<系统ID>：指定光盘的系统ID； 
+-T或-translation-table：建立文件名的转换表，适用于不支持Rock Ridge Extensions的系统上； 
+-v或-verbose：执行时显示详细的信息； 
+-V<光盘ID>或-volid<光盘ID>：指定光盘的卷册集ID； 
+-volset-size<光盘总数>：指定卷册集所包含的光盘张数； 
+-volset-seqno<卷册序号>：指定光盘片在卷册集中的编号； 
+-x<目录>：指定的目录将不会放入映像文件中； 
+-z：建立通透性压缩文件的SUSP记录，此记录目前只在Alpha机器上的Linux有效。
+
+
+
+
+
+
+
+

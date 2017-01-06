@@ -1,0 +1,285 @@
+Shell 编程跟java、php编程一样，只要有一个能编写代码的文本编辑器和
+一个能解释执行的脚本解释器就可以了。
+
+
+
+Linux的Shell种类众多，常见的有：
+Bourne Shell（/usr/bin/sh或/bin/sh）
+Bourne Again Shell（/bin/bash）
+C Shell（/usr/bin/csh）
+K Shell（/usr/bin/ksh）
+Shell for Root（/sbin/sh）
+
+
+
+Bourne Again Shell，由于易用和免费，Bash在日常工作中被广泛使用。
+同时，Bash也是大多数Linux系统默认的Shell。
+
+
+
+在一般情况下，人们并不区分 Bourne Shell 和 Bourne Again Shell，所以，
+像 #!/bin/sh，它同样也可以改为#!/bin/bash。
+
+
+
+"#!"   是一个约定的标记，它告诉系统这个脚本需要什么解释器来执行，
+即使用哪一种Shell。
+
+
+
+$1表示你传递给这个脚本的第1个参数
+test.sh中如下代码：
+#!/bin/bash
+echo $1
+
+chmod +x ./test.sh      获取执行权限
+./test.h "hello"        执行脚本文件，并将第1个参数传递给脚本，
+                        将hello传递给脚本，然后echo输出
+
+$0	当前脚本的文件名
+$n	传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是$1，第二个参数是$2。
+$#	传递给脚本或函数的参数个数。
+$*	传递给脚本或函数的所有参数。
+$@	传递给脚本或函数的所有参数。被双引号(" ")包含时，与 $* 稍有不同，下面将会讲到。
+$?	上个命令的退出状态，或函数的返回值。
+$$	当前Shell进程ID。对于 Shell 脚本，就是这些脚本所在的进程ID。
+
+#!/bin/bash
+echo "File Name: $0"
+echo "First Parameter : $1"
+echo "First Parameter : $2"
+echo "Quoted Values: $@"
+echo "Quoted Values: $*"
+echo "Total Number of Parameters : $#"
+
+运行结果
+File Name : ./test.sh
+First Parameter : Zara
+Second Parameter : Ali
+Quoted Values: Zara Ali
+Quoted Values: Zara Ali
+Total Number of Parameters : 2
+
+
+if语句
+if [ ];then
+
+else
+
+fi
+
+选项
+-lt   less than小于的意思
+-z    zero 为零的意思，如if [ ! -z $1]，脚本获取的第一个参数如果不为空，则执行then后语句
+-f    如果文件存在
+-d    如果目录存在
+
+
+
+
+输出/输入重导向
+cmd> file   把cmd命令的输出重定向到文件file中。如果file已经存在，则清空原有文件
+cmd >> file    把cmd命令的输出重定向到文件file中，如果file已经存在，则把信息加在原有文件後面
+
+
+
+dd命令
+把软盘上的数据写成硬盘的一个寄存文件，再把这个寄存文件写入第二张软盘上，完成diskcopy的功能。
+需要注意的是，应该将硬盘上的寄存文件用rm命令删除掉
+dd + ..
+if =输入文件（或设备名称）
+of =输出文件（或设备名称）
+
+如：要把一张软盘的内容拷贝到另一张软盘上，利用/tmp作为临时存储区。
+把源盘插入驱动器中，输入下述命令
+dd if =/dev/fd0 of = /tmp/tmpfile
+
+拷贝完成后，将源盘从驱动器中取出，把目标盘插入，输入命令
+dd if = /tmp/tmpfile of =/dev/fd0 
+
+软盘拷贝完成后，应该将临时文件删除
+rm /tmp/tmpfile 
+
+
+
+fsck(file system check)是为检查各种不同的文件系统提供一个统一的用户界面。
+e2fsck是用于ext2/ext3类型的文件系统检查的一个工具。
+
+e2fsck -f   强制检查
+
+resize2fs命令被用来增大或者收缩未加载的“ext2/ext3”文件系统的大小。
+如果文件系统是处于mount状态下，那么它只能做到扩容，前提条件是内核支持在线resize。
+linux kernel 2.6支持在mount状态下扩容但仅限于ext3文件系统
+
+resize2fs -Mp
+-M    减小文件系统到最小的大小
+-p    为了每一个resize2fs操作打印一个百分比完成条
+
+
+
+'string' 单引号 (single quote) 
+被单引号用括住的内容，将被视为单一字串。在引号内的代表变数的$符号，没有作用
+也就是说，他被视为一般符号处理，防止任何变量替换。 
+
+
+
+\"string\" 双引号 (double quote) 
+被双引号用括住的内容，将被视为单一字串。它防止通配符扩展，但允许变量扩展。
+这点与单引数的处理方式不同。 
+
+
+
+cd `dirname $0`
+倒冒号
+在命令行下运行此代码毫无意义，因为他返回当前路径的"."
+在脚本文件里，返回这个脚本文件放置目录，
+并可以根据这个目录来定位所要运行程序的相对位置(绝对位置除外)
+
+如，在/home/admin/test/ 下新建test.sh，内容如下
+#!/bin/bash
+cd `dirname $0`
+echo `pwd`
+
+返回到/home/admin/执行
+sh test/test.sh
+
+运行结果/home/admin/test
+
+
+
+squashfs  是一套基于Linux内核使用的压缩只读文件系统。
+该文件系统能够压缩系统内的文档,inode以及目录，文件最大支持2^64字节。
+
+mksquashfs squashfs-root filesystem.squashfs   制作squashfs文件系统
+当新的文件添加到新的文件系统或添加到现有的，**mksquashfs将自动重复名称重命名文件
+如果两个或多个文件命名文本将出现在同一个生成的目录，第二个文件将被重新命名为文本1 ，第三个到文本_2等
+
+
+
+printf 命令的语法：
+printf  format-string  [arguments...]
+format-string 为格式控制字符串，arguments 为参数列表。
+
+printf()在C语言入门教程中已经讲到，功能和用法与 printf 命令类似，请查看：C语言格式输出函数printf()详解
+
+这里仅说明与C语言printf()函数的不同：
+printf 命令不用加括号
+format-string 可以没有引号，但最好加上，单引号双引号均可。
+参数多于格式控制符(%)时，format-string 可以重用，可以将所有参数都转换。
+arguments 使用空格分隔，不用逗号。
+
+请看下面的例子：
+# format-string为双引号
+$ printf "%d %s\n" 1 "abc"
+1 abc
+# 单引号与双引号效果一样 
+$ printf '%d %s\n' 1 "abc" 
+1 abc
+# 没有引号也可以输出
+$ printf %s abcdef
+abcdef
+# 格式只指定了一个参数，但多出的参数仍然会按照该格式输出，format-string 被重用
+$ printf %s abc def
+abcdef
+$ printf "%s\n" abc def
+abc
+def
+$ printf "%s %s %s\n" a b c d e f g h i j
+a b c
+d e f
+g h i
+j
+
+
+
+du：查询档案或目录的磁盘使用空间
+
+du [-abcDhHklmsSx0] [-L][-X File][--block-size=SIZE][--exclude=PATTERN] [--max-depth=N][--help][--version][FILE-OR-PATH]
+
+参数说明：
+
+-0 每个结果显示后不换行
+-a或–all 为每个指定文件显示磁盘使用情况，或者为目录中每个文件显示各自磁盘使用情况。
+–apparent-size 显示目录或文件自身的大小
+-B或–block-size=SIZE 以SIZE为计量单位显示目录或文件大小；SIZE可以为任意整数，也可以为KB 1000, K 1024, MB 10001000, M 10241024, 类似地对于G, T, P, E, Z, Y。
+-b或–bytes 以byte为单位显示目录或文件大小，等价于’–apparent-size –block-size=1′
+-c或–total 除了显示目录或文件的大小外，同时显示所有目录或文件的总和。
+-D或–dereference-args 显示指定符号连接的源文件大小。
+–files0-from=F 显示文件F 中以NUL 结尾的文件名对应占用的磁盘空间；如果F 的值是”-”，则从标准输入读入文件名
+-h或–human-readable 以K，M，G为单位，提高信息的可读性。
+-H或–si 与-h参数相同，但是K，M，G是以1000为换算单位,而不是以1024为换算单位。
+-k或–kilobytes 以1024 bytes为单位，等价于–block-size=1K。
+-l或–count-links 重复计算硬连接的文件。
+-L或–dereference 统计符号连接源文件大小。
+-P或–no-dereference 不同符号链接源文件的大小，默认。
+-m或–megabytes 以1MB为单位，等价于–block-size=1M。
+-s或–summarize 仅显示总计，即当前目录的大小。
+-S或–separate-dirs 显示每个目录的大小时，并不含其子目录的大小。
+-x或–one-file-system 忽略位于其他文件系统上的目录。
+-X FILE或–exclude-from=FILE 忽略在FILE文件中指定目录或文件。
+–exclude=PATTERN 忽略符合PATTERN规则的目录或文件。
+–max-depth=N 只显示N层内的目录大小，–max-depth=0等同于–summarize。
+–time 显示目录或子目录中文件的最后修改时间。
+–time=WORD 以WORD指定的时间代替修改时间；WORD取值atime, access, use, ctime, status之一。
+–time-style=STYLE 以STYLE指定的格式显示时间；STYLE取值full-iso, long-iso, iso, +FORMAT之一，其中FORMAT格式同date命令。
+–help 显示帮助。
+–version 显示版本信息。
+
+
+
+
+cut命令
+cut是一个选取命令，以行为单位，用指定分隔符将行切分为若干字段，选取所需要的字段
+cut [option] files
+option常用参数如下：
+ 
+
+-d：用来定义分隔符，默认为tab键，一般与-f配合使用（如果分隔符是空格，必须是两个单引号之间确实有一个空格，是一个哦，不是支持多个）
+-f：需要选取的字段，根据-d切分的字段集选取，下标从1开始
+-s：表示不包括那些不含分隔符的行，用于去掉注释或者标题一类的信息
+-c：以字符为单位进行分割，可以选取指定字符
+-b：以字节为单位进行分割，可以选取指定字节，这些字节位置将忽略多字节字符边界（比如：汉字），除非同时指定了-n参数
+-n：取消分割多字节字符，只能和-b参数配合使用，即如果字符的最后一个字节落在由-b参数列表指定的范围之内，则该字符将被选出，否则，该字符将被排除。
+
+如（以:为分隔符）
+#echo $PATH
+/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/home/changquan.scq/bin
+ 
+（1）选取第2个路径：
+#echo $PATH | cut -d: -f2
+/usr/local/bin
+ 
+（2）选取第2个开始后的所有路径：
+#echo $PATH | cut -d: -f2-
+/usr/local/bin:/bin:/usr/bin:/home/changquan.scq/bin
+ 
+（3）选取第2到第4个路径，包括第4个路径：
+#echo $PATH | cut -d: -f2-4
+/usr/local/bin:/bin:/usr/bin
+ 
+（4）选取从第1个到第4个路径，包括第4个路径：
+#echo $PATH | cut -d: -f-4
+/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin
+ 
+（5）选取从第1个到最后一个路径的所有路径：
+#echo $PATH | cut -d: -f-
+/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/home/changquan.scq/bin
+（6）选取第1个路径和第3个路径：
+#echo $PATH | cut -d: -f1,3
+/usr/kerberos/bin:/bin
+ 
+（7）选取第1到第3个路径和第5个路径：
+#echo $PATH | cut -d: -f1-3,5
+/usr/kerberos/bin:/usr/local/bin:/bin:/home/changquan.scq/bin
+
+
+
+
+
+
+
+
+
+
+
+

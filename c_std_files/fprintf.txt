@@ -1,0 +1,9 @@
+
+#include <stdio.h>
+
+函数原型 int fprintf( FILE *stream, const char *format, [ argument ]...);
+
+说明：根据参数format 字符串来转换并格式化数据, 然后将结果输出到参数stream 指定的文件中, 
+直到出现字符串结束('\0')为止
+
+返回值是输出的字符数,发生错误时返回一个负值

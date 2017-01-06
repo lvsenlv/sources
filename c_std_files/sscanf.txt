@@ -1,0 +1,11 @@
+
+#include <stdio.h>
+
+函数原型:
+int sscanf( const char *, const char *, ...);
+int sscanf(const char *buffer,const char *format,[argument ]...);
+
+说明：从buffer里读进数据，依照format的格式将数据写入到argument里
+
+成功则返回参数数目，失败则返回-1
+在linux系统中成功返回的是成功转换的值的个数

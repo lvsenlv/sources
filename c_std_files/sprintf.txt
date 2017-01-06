@@ -1,0 +1,10 @@
+
+#include <stdio.h>
+
+函数原型 int sprintf( char *buffer, const char *format, [ argument] … );
+
+说明：把格式化的数据写入某个字符串缓冲区
+
+返回写入buffer 的字符数，结束字符‘\0’不计入内，出错则返回-1. 
+如果 buffer 或 format 是空指针，且不出错而继续，函数将返回-1
+

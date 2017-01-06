@@ -1,0 +1,60 @@
+这里假设服务器 A 的IP：192.168.0.1
+        服务器 B 的IP：192.168.0.2
+
+需要从A免密码输入复制文件至B
+
+***在操作前，先备份 A 服务器上原先的内容（当前用户的ssh key文件，在.ssh文件夹中，带前缀 . 的文件夹是隐藏的，用ls -a 查看）
+在服务器A上执行：
+
+cd ~/
+cp -r .ssh .ssh_bk
+
+***使用此方法需要注意：复制的两台计算机需要用相同的账户名，这里都是用的root用户
+   如终端显示的是 root@x86:~# ， @符号左边显示的即为当前登录的用户名
+
+1. 在服务器 A 上执行如下命令来生成配对密钥： 
+
+ssh-keygen  -t  rsa 
+
+会提示将 key 保存的目录，使用默认目录即可，直接输入 y 回车即可
+之后若提示输入passphrase之类的，直接回车即可
+若之前已经操作过，所以还提示了是否覆盖，输入 y 回车即可 
+
+正常情况下，会在 .ssh 文件夹中生成 id_rsa  与 id_rsa.pub 文件
+有时会默认生成名为 y 和 y.pub 文件，甚至直接在当前目录下生成，并未在 .ssh 文件夹中生成，
+将其重命名为上述对应的名字即可，命令如下
+(mv命令可用于重命名, 如 mv A B 若B文件不存在，则将A命名为B，若B文件已存在，则将A文件覆盖B文件，若B为目录名，则将A移动到B文件夹中)
+
+mv  y  id_rsa
+mv  y.pub  id_rsa.pub
+
+若直接在当前目录直接生成，则需将文件移动到 .ssh 文件夹中，命令如下：
+
+mv  id_rsa  id_rsa.pub  .ssh/
+
+2. 将 .ssh/ 目录中的 id_rsa.pub 文件内容复制到服务器 B 的 .ssh/ 目录中，并重命名为 authorized_keys
+
+***若服务器B .ssh文件夹中已存在 authorized_keys 文件，则执行：
+在A服务器上执行 scp .ssh/id_rsa.pub root@192.168.0.2:/root/.ssh/temp
+在B服务器上执行以下命令
+
+cd ~/.ssh
+cat temp >> authorized_keys
+rm temp
+
+***若服务器B .ssh文件夹中不存在 authorized_keys 文件，则执行：
+在A服务器上执行 scp .ssh/id_rsa.pub root@192.168.0.2:/root/.ssh/authorized_keys
+
+以后从服务器 A scp 到服务器 B 就不需要密码了
+
+若误操作，想恢复，则将刚添加至authorized_keys文件中的内容删除即可
+在服务器B中执行
+
+cd ~/.ssh
+sed -i '$d' authorized_keys
+
+若要恢复服务器A为原先状态，执行：
+
+cd ~/
+rm -r  .ssh
+mv  .ssh_bk  .ssh

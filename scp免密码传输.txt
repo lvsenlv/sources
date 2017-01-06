@@ -1,0 +1,39 @@
+***来源http://www.cnblogs.com/wayne173/p/5505863.html***
+
+这里假设需要备份的服务器 S 的IP：192.168.0.1
+用作备份的服务器 B 的 IP：192.168.0.2
+
+需要从A免密码输入复制文件至B。
+
+
+1. 在服务器 S 上执行如下命令来生成配对密钥： 
+ssh-keygen -t rsa 
+按照提示操作，注意，不要输入passphrase，因为我的之前已经操作过，所以还提示了是否覆盖，输入 "y"回车就可以。其他提示信息如下 
+Generating public/private rsa key pair. 
+Enter file in which to save the key (/root/.ssh/id_rsa): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /root/.ssh/id_rsa. 
+Your public key has been saved in /root/.ssh/id_rsa.pub. 
+The key fingerprint is: 
+ff:8e:85:68:85:94:7c:2c:46:b1:e5:2d:41:5c:e8:9b root@localhost.domain
+
+2. 将 /root/.ssh/ 目录中的 id_rsa.pub 文件复制到 服务器 B 的 /root/.ssh/ 目录中，并改名为 authorized_keys。 
+scp .ssh/id_rsa.pub root@192.168.0.2:/root/.ssh/authorized_keys
+
+以后从服务器 S scp 到服务器 B 就不需要密码了。
+
+3.使用此方法需要注意：复制的两台计算机需要用相同的账户名，这里都是用的root。为了安全起见，需要在两台机器中创建相同的账号，然后在服务器 S 上用 su 命令切换至该账号下，然后执行第1步，第2步中复制文件时可能 ~/.ssh/ 目录并不存在，需要手动创建。
+
+在第2步中如果机器中已经存在authorized_keys文件，则需注意，这个文件可以包含多个SSH验证信息，这时可用 cat >> 命令将验证文件内容附加上去。
+
+现在服务器 S 上执行脚本 scp ~/.ssh/id_rsa.pub root@192.168.0.2:/root/.ssh/s.pub
+
+然后在服务器 B 上执行 cat ~/.ssh/s.pub >> ~/.ssh/authorized_keys
+
+最后可以用个小的文本文件试试。
+在服务器 S 上执行
+touch ~/test
+scp ~/test root@192.168.0.2:/root/
+
+在服务器 B 上用 ls查看是否成功，其实刚才在服务器 S 上执行 scp 的时候已经提示传输成功了。

@@ -1,0 +1,16 @@
+xinetd监听：
+配置文件：
+/etc/xinetd.h/rsync
+
+端口文件：
+/etc/services
+
+启动监听:
+/etc/init.d/xinetd start
+
+启动rsync进程：
+rsync --daemon --config=....
+
+开启rsync日志：
+rsync --daemon --config=.... --log-file=....
+

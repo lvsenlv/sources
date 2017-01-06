@@ -1,0 +1,88 @@
+sudo apt-get install + ...                      安装文件
+
+mkdir C_Test                                    创建C_Test新文件夹
+
+touch C_Test.c                                  创建C_Test.c文件
+
+rm C_Test.c                                     删除C_Test.c文件
+rm -rf C_Test                                   删除C_Test文件夹
+
+ls                                              查看当前目录下所有文件和文件夹
+ls -l                                           列出当前目录下所有文件和文件夹的属性
+
+cd直接回车                                      回到当前用户所在的目录
+cd 目录                                         进入某目录
+cd /.../...                                     进入某路径下的目录
+cd空格..                                        退回上一目录
+
+cp 源文件 目标文件                              拷贝单个文件
+cp -arvf 源文件 目标文件                        拷贝整个文件夹
+
+mv 源文件 目标文件                              移动/剪切/重命名文件
+
+tar -czf  压缩包名.tar.gz 源目录名              压缩文件夹
+tar -arvf 压缩包名.tar.gz -c 目录名             解压缩文件夹到指定的目录下      
+
+a 或者 i 或 o                                   进入：插入模式
+ESC按键                                         退出：插入模式  
+
+末行模式   
+:wq                                             :为标识符  w为保存   q为推出
+:q!                                             强制推出
+
+shift + v         选中,上下移动可多选中
+y                 复制
+p                 粘贴到光标下一行
+d                 剪切
+
+yw                复制光标所在处的一串英文
+dw                删除光标所在处的一串英文
+
+yy                复制光标所在行
+dd                剪切/删除光标所在行
+u                 撤销一步操作
+ctrl r            恢复撤销
+
+/内容             查找内容
+
+:w + 文件名       另存储为
+
+shift g           跳转到文件尾
+gg                跳转到文件头
+gg=g              直接缩进
+
+区分命令模式和末行模式：末行模式左下角会出现相应命令而命令模式没有
+
+vim -o2  文件名1 文件名2                                 直接打开两个文件
+ctrl ww                                                  跳转到另一个文件
+
+vim /etc/vim/vimrc                                       设置vim
+set nu                                                   添加行号
+set tabstop=4                                            设置(软)制表符宽度
+set softtabstop=4
+set shiftwidth=4                                         设置缩进的空格数             
+set autoindent                                           设置自动缩进，noautoindent取消设置
+set cindent                                              C/C++语言的自动缩进方式
+set cinoptions={0,1s,t0,n-2,p2s,(03s,=.5s,>1s,=1s,:1s    设置C/C++语言的具体缩进方式
+最后，如果没有下列语句，就加上吧：
+if &term=="xterm"
+set t_Co=8
+             set t_Sb=^[[4%dm
+set t_Sf=^[[3%dm
+endif
+
+:x                                    跳转到第x行 
+
+:s/old/new                            将当前行中的第一个old字符串替换为new 
+:s/old/new/g                          将当前行中的所有old字符串替换为new
+:x,ys/old/new                         将第x行到第y行中所有old字符串替换为new
+
+gcc -E hello.c -o hello.i             预处理
+gcc -S hello.i -o hello.s             编译
+gcc -c hello.s -o hello.o             汇编
+gcc hello.o -o hello                  链接 (生成名字为hello的可执行文件)
+
+gcc hello.c                           编译hello.c文件，生成a.out
+./hello                               运行名字为hello的可执行文件
+
+sudo gedit /etc/hostname              修改计算机名
