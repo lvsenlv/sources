@@ -1,5 +1,16 @@
 #!/bin/bash
 
-#cp ../src/Makefile
-#cp ../src/Makefile
+if [ ! -z $1 ];then
+    DIR_DEPTH=$1
+else
+    DIR_DEPTH=1
+fi 
+
+SRCS_PATH=`find ../src/ -maxdepth $DIR_DEPTH -type d | sed 's/^'"..\/src\/"'//g'`
+cd ../src/ 
+
+for dir in $SRCS_PATH;
+do
+    cp Makefile $dir
+done
 
