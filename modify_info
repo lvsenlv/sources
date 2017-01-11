@@ -1,0 +1,22 @@
+On branch sh_files
+Your branch is up-to-date with 'origin/sh_files'.
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   compile_env.sh
+	new file:   create_ctags.sh
+	new file:   expand_img.sh
+	new file:   lvsenlv_git.sh
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	modify_info
+
+################################################################
+#add files to sh_files
+    compile_env.sh
+    create_ctags.sh
+    expand_img.sh
+    lvsenlv_git.sh
+
