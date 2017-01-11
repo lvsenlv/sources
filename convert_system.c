@@ -9,22 +9,35 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUF_SIZE (100*sizeof(char))
+
 void print_info(int options);
-void convert(long int * ptr, unsigned int output_type, int size);
+char *convert(long int * ptr, unsigned int output_type, int size);
+
 char *g_info[] = { 
     "Usage: convert_system [input type] [output type] number1 number2",
     "malloc failed",
     "input type: only support 2  8  10  16",
     "output type: only support 2  8  10  16",
-
 };
 
-int main(int argc , char *argv[])
+//int main(int argc, char *argv[])
+int main(void)
 {
+    int argc = 5;
+    char *argv[5] = {
+        "test",
+        "10",
+        "2",
+        "10",
+        "123"
+    };
     int i = 0, j = 0;
     unsigned int input_type = 0, output_type = 0;
     long int inputs = 0;
+    char *output = NULL;
     long int *ptr = NULL;
+    int size = 0;
 
     if(argc < 4)
     {
@@ -74,10 +87,31 @@ int main(int argc , char *argv[])
         return 0;
     }
     
-    long int *p = ptr;
-    //convert(ptr, output_type, argc);
+    output = convert(ptr, output_type, argc-3);
+    size = strlen(output)-1;
+    for(i = 3; i < argc; i++)
+    {
+        switch(input_type)
+        {
+            case 10:
+                printf("%s(D) -> ", *(argv+i));
+                break;
+            default:
+                break;
+        }
+        printf("%s \n", output);
+        /*
+        j = 0;
+        do
+        {
+            printf("%c", *(output+BUF_SIZE-1-j));
+        }while( *(output+BUF_SIZE-1-j++) != '\n' );
+        */
 
-    free(p);
+    }
+
+    free(ptr);
+    free(output);
     ptr = NULL;
     return 0;
 }
@@ -89,30 +123,31 @@ void print_info(int options)
    \n", *(g_info+options-1));
 }
 
-void convert(long int * ptr, unsigned int output_type, int size)
+char *convert(long int * ptr, unsigned int output_type, int size)
 {
     int i =0, j = 0;
-    int flag = 0;
+    int result = 0;
     char *temp = NULL;
-    temp = (char *)malloc(50);
+    temp = (char *)malloc(BUF_SIZE);
     switch(output_type)
     {
         case 2:
-            j = 0;
+            j = 0 ;
             for(i = 0; i < size; i++)
             {
                 do
                 {
-                    *(temp+j) = (char)( (*ptr%2 == 0 )? 0 : 1 );
+                    *(temp+j++) = (*ptr%2 == 0 )? '0' : '1' ;
                     *ptr = *ptr / 2;
                 }while(*ptr != 0);
+                *(temp+j++) = ' ';
                 ptr++;
             }
-            printf("%s \n", temp);
-                break;
+            break;
         default:
             break;
     }
-    free(temp);
+
+    return temp;
 }
 
