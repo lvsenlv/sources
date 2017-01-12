@@ -1,0 +1,9 @@
+***更多详细请看：http://blog.csdn.net/ruixj/article/details/4274721***
+
+#include <stdio.h>
+
+__attribute__语法格式为：
+__attribute__((......))
+
+__attribute__((constructor))		在main函数被调用之前调用
+__attribute__((destructor))		在main函数被调用之后调
