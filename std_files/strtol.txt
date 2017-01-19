@@ -1,0 +1,14 @@
+
+#include <stdlib.h>
+
+函数原型 long int strtol(const char *nptr,char **endptr,int base);
+
+说明：字符串转换为进制数
+参数base范围从2至36，或0，表示将nptr指向的字符串转换为 base 进制
+若base 以0x’字符开头则会使用16进制做转换、以’0’字符开头而不是’0x’的时候会使用8进制做转换
+
+endptr是一个传出参数，函数返回时指向后面未被识别的第一个字符。
+例如char *pos; strtol("123abc", &pos, 10);
+strtol返回123，pos指向字符串中的字母a。
+如果字符串开头没有可识别的整数，例如char *pos; strtol("ABCabc", &pos, 10);
+则strtol返回0，pos指向字符串开头，可以据此判断这种出错的情况，而这是atoi处理不了的。
