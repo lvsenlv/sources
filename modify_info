@@ -1,15 +1,14 @@
 On branch c_files
 Your branch is up-to-date with 'origin/c_files'.
 Changes not staged for commit:
-  (use "git add/rm <file>..." to update what will be committed)
+  (use "git add <file>..." to update what will be committed)
   (use "git checkout -- <file>..." to discard changes in working directory)
 
-	deleted:    convert_system.c
 	modified:   modify_info
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
 
-	convert_system/
+	template_Makefile/include/
 
 no changes added to commit (use "git add" and/or "git commit -a")
