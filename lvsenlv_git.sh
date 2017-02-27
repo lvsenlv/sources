@@ -10,6 +10,7 @@ function echo_message()
     3. git clone git@github.com:lvsenlv/vim_config.git
     4. git clone git@github.com:lvsenlv/ubuntu_config.git
     5. git clone git@github.com:lvsenlv/jz2440.git
+    6. git clone git@github.com:lvsenlv/graduation.git
     "
     return 0
 }
@@ -20,7 +21,7 @@ if [ $? != 0 ];then
     exit 1
 fi
 
-if [[ -z $1 || $1 -lt 1 || $1 -gt 5 ]];then
+if [[ -z $1 || $1 -lt 1 || $1 -gt 6 ]];then
     echo_message
     exit 1
 fi
@@ -40,6 +41,9 @@ case $1 in
         ;;
     5 )
         git clone git@github.com:lvsenlv/jz2440.git
+        ;;
+    6 )
+        git clone git@github.com:lvsenlv/graduation.git
         ;;
     * )
         ;;
