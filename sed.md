@@ -158,4 +158,20 @@ test.sh 脚本内容如下：
 		sed -i 's/'"$BRANCH"'/'"$VERSION_NUM"'/g' test.txt
 		cat test.txt
 		
+###Extra
+test.txt 存在如下内容：  
+latest_version=BETA.2017.0224.014243 base_version=beta_14.12.0  
 		
+		sed -n 's/latest_version/temp/p' test.txt
+		//输出：temp=BETA.2017.0224.014243 base_version=beta_14.12.0
+		
+		sed -n 's/latest_version=.*/temp/p' test.txt
+		//输出：temp
+
+		sed -n 's/latest_version.* /temp /p' test.txt
+		//输出：temp base_version=beta_14.12.0
+
+		sed -n 's/latest_version=[^ ]*/temp/p' test.txt
+		//输出：temp base_version=beta_14.12.0
+
+
