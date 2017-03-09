@@ -1,0 +1,9 @@
+
+#include <memory.h>或<string.h>
+
+函数原型：void *memset(void *s, int ch, size_t n);
+
+说明：将s中当前位置后面的n个字节 （typedef unsigned int size_t ）用 ch 替换并返回 s ；
+	作用是在一段内存块中填充某个给定的值，它是对较大的结构体或数组进行清零操作的一种最快方法；
+
+警告：memset函数对数组而言只能用于置零（0）或置负一（-1）操作
