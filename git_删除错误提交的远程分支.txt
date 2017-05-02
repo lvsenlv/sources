@@ -1,0 +1,35 @@
+针对已经将错误的commit提交到远程的情况，下面介绍删除方法：
+
+以删除master分支的commit为例(警告：数据无价，谨慎操作):
+
+假设master 分支的commit如下：
+commit aaaaaaaaaaaaaaaaaaaaa
+commit bbbbbbbbbbbbbbbbbbbbb
+commit ccccccccccccccccccccc
+
+以删除 commit aaaaaaaaaaaaaaaaaaaaa 为例：
+
+#新建一个本地临时分支，以备份数据
+git branch tmp_branch
+
+#提交本地当前的文件到新建的分支，并提交到远程
+git push origin tmp_branch:tmp_branch
+
+#本地master分支版本回退
+git reset --hard bbbbbbbbbbbbbbbbbbbbb
+
+#这样一来，本地仓库就已经删除 commit aaaaaaaaaaaaaaaaaaaaa 了
+
+#删除远程的master分支
+git push origin :master
+
+#如果出现! [remote rejected] master（......），说明没有设置远程的默认分支，没有权限删除
+#请在web端settings->branch 页面，修改默认分支为新建的分支
+
+#进行到这里，远程的master分支已经删除成功
+#重新提交本地文件到master分支（此时会自动新建master分支）
+git push origin master
+
+#确认操作无误后，删除备份的数据
+git push origin :tmp_branch
+

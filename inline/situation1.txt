@@ -1,0 +1,233 @@
+situation1：
+
+//smain.c
+#include <stdio.h>
+
+inline void disp(void);
+
+int main(int argc, char **argv)
+{
+    int i = 0;
+
+    for(i = 0; i < 100; i++)
+    {
+        disp();
+    }
+
+    return 0;
+}
+
+inline void disp(void)
+{
+    printf("inline in %s \n", __func__);
+}
+
+程序看起来没有任何问题，但执行编译：gcc -std=c99 main.c
+编译报错：
+/tmp/ccGyr0E2.o: In function `main':
+main.c:(.text+0x22): undefined reference to `disp'
+collect2: error: ld returned 1 exit status
+
+执行编译：gcc -std=c99 main.c -S -o mian_1.s
+查看汇编文件：
+//mian_1.s
+......
+main:
+.LFB0:
+	.cfi_startproc
+	leal	4(%esp), %ecx
+	.cfi_def_cfa 1, 0
+	andl	$-16, %esp
+	pushl	-4(%ecx)
+	pushl	%ebp
+	.cfi_escape 0x10,0x5,0x2,0x75,0
+	movl	%esp, %ebp
+	pushl	%ecx
+	.cfi_escape 0xf,0x3,0x75,0x7c,0x6
+	subl	$20, %esp
+	movl	$0, -12(%ebp)
+	movl	$0, -12(%ebp)
+	jmp	.L2
+.L3:
+	call	disp
+	addl	$1, -12(%ebp)
+......
+
+可看到 call disp 语句，即在此处调用disp函数，说明编译器未进行内联展开。
+且没有看到disp函数的代码块，这就是编译报错的原因，由于不存在disp的代码块，
+链接器无法连接，所以显示上述链接错误的信息。
+
+若将函数声明 inline void disp(void); 改为 void disp(void);
+执行编译：gcc -std=c99 main.c
+可以通过编译。
+
+执行编译：gcc -std=c99 main.c -S -o mian_2.s
+查看汇编文件：
+//main_2.s
+......
+main:
+.LFB0:
+	.cfi_startproc
+	leal	4(%esp), %ecx
+	.cfi_def_cfa 1, 0
+	andl	$-16, %esp
+	pushl	-4(%ecx)
+	pushl	%ebp
+	.cfi_escape 0x10,0x5,0x2,0x75,0
+	movl	%esp, %ebp
+	pushl	%ecx
+	.cfi_escape 0xf,0x3,0x75,0x7c,0x6
+	subl	$20, %esp
+	movl	$0, -12(%ebp)
+	call	disp
+	movl	$0, %eax
+......
+disp:
+.LFB1:
+	.cfi_startproc
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$8, %esp
+	subl	$8, %esp
+	pushl	$__func__.1701
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+......
+
+可以看到，编译器为disp函数生成了独立的代码块，但是仍然可看到 call disp 语句，
+说明编译器未进行内联展开。
+
+那么如何才能达到内联展开的效果呢？这里介绍两种方法。
+方法1：
+开启编译优化
+执行编译：gcc -std=c99 main.c -S -O1 -o main_3.s
+查看汇编文件：
+//main_3.s
+......
+main:
+.LFB13:
+	.cfi_startproc
+	leal	4(%esp), %ecx
+	.cfi_def_cfa 1, 0
+	andl	$-16, %esp
+	pushl	-4(%ecx)
+	pushl	%ebp
+	.cfi_escape 0x10,0x5,0x2,0x75,0
+	movl	%esp, %ebp
+	pushl	%ecx
+	.cfi_escape 0xf,0x3,0x75,0x7c,0x6
+	subl	$8, %esp
+	pushl	$__func__.1833
+	pushl	$.LC0
+	pushl	$1
+	call	__printf_chk
+	addl	$16, %esp
+......
+disp:
+.LFB14:
+	.cfi_startproc
+	subl	$16, %esp
+	.cfi_def_cfa_offset 20
+	pushl	$__func__.1833
+	.cfi_def_cfa_offset 24
+	pushl	$.LC0
+	.cfi_def_cfa_offset 28
+	pushl	$1
+	.cfi_def_cfa_offset 32
+	call	__printf_chk
+	addl	$28, %esp
+......
+
+可以看到，编译器对在main函数中对disp函数进行内联展开，
+同时为disp函数生成独立的代码块。
+
+方法2：
+使用__attribute__((always_inline))强制内联展开
+//main.c
+#include <stdio.h>
+
+void disp(void);
+
+int main(int argc, char **argv)
+{
+    int i = 0;
+    
+    disp();
+
+    return 0;
+}
+
+__attribute__((always_inline)) inline void disp(void)
+{
+    printf("inline in %s \n", __func__);
+}
+
+执行编译：gcc -std=c99 main.c -S -o main_4.s
+查看汇编文件：
+//main_4.s
+......
+main:
+.LFB0:
+	.cfi_startproc
+	leal	4(%esp), %ecx
+	.cfi_def_cfa 1, 0
+	andl	$-16, %esp
+	pushl	-4(%ecx)
+	pushl	%ebp
+	.cfi_escape 0x10,0x5,0x2,0x75,0
+	movl	%esp, %ebp
+	pushl	%ecx
+	.cfi_escape 0xf,0x3,0x75,0x7c,0x6
+	subl	$20, %esp
+	movl	$0, -12(%ebp)
+	subl	$8, %esp
+	pushl	$__func__.1701
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+......
+disp:
+.LFB1:
+	.cfi_startproc
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$8, %esp
+	subl	$8, %esp
+	pushl	$__func__.1701
+	pushl	$.LC0
+	call	printf
+	addl	$16, %esp
+......
+
+可以看到，编译器对在main函数中对disp函数进行内联展开，
+同时为disp函数生成独立的代码块。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

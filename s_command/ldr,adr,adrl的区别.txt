@@ -1,0 +1,38 @@
+分析ldr和 adr/adrl 伪指令的区别
+
+1. ldr
+ldr r1, =_start
+实际上会被编译器改成两条语句：
+0x00 ldr r1,[pc, #0x0c]
+//编译器知道DCD的地址，相对于ldr的地址偏移量，所以用ldr指令从此地址中取出0x64
+....
+0x0c DCD 0x64
+
+_start:
+0x64 MOVE r0,r0
+
+2. adr //寻址空间是4KB
+adr r1, _start
+实际上会被编译器改成一条语句：
+0x00 add r1, pc, #0x64
+
+_start:
+0x64 MOVE r0,r0
+
+3. adrl //转化成两个ADD，寻址空间是8KB
+ 
+4.综述
+所以综上所述，ldr和adr的区别主要就是地址的位置无关性的差别。
+ldr伪指令操作，一旦实际运行物理地址和期望运行物理地址存在差别，那就会造成程序运行错误。
+虽然adr有这么多优点，但是adr的寻址空间只有前后4kb，而且必须在同一个代码段中，ldr就没有这些要求。
+
+注意：
+ldr r1, =_start
+ldr r1, _start
+两者的区别：
+
+ldr Rn,=Label    伪指令         取地址    位置相关 反汇编：将Label的地址（绝对地址）保存在一个编译期间确定的地址， 
+ldr Rn,Label     arm指令        取值      位置无关 反汇编：相对于PC取Lable的值 
+
+
+

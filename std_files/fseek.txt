@@ -1,0 +1,15 @@
+
+#include <stdio.h>
+
+函数原型：int fseek(FILE *stream, long offset, int fromwhere);
+
+说明：函数设置文件指针stream的位置。
+如果执行成功，stream将指向以fromwhere
+（偏移起始位置：文件头0(SEEK_SET)，当前位置1(SEEK_CUR)，文件尾2(SEEK_END)）为基准，
+偏移offset（指针偏移量）个字节的位置。
+
+如果执行失败(比如offset超过文件自身大小)，则不改变stream指向的位置。
+
+fseek函数和lseek函数类似，但lseek返回的是一个off_t数值，而fseek返回的是一个整型。
+
+成功，返回0，失败返回-1，并设置error的值，可以用perror()函数输出错误。
